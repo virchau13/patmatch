@@ -40,7 +40,7 @@ pub struct LiteralStr(pub String);
 
 impl CompiledPat for LiteralStr {
     fn matches(&self, string: &str) -> bool {
-        return string == self.0;
+        string == self.0
     }
 }
 
@@ -95,10 +95,10 @@ impl CompiledPat for General {
                         State::Wildcard => (true, true),
                     };
                     active_next[j] |= stay;
-                    active_next[j+1] |= advance;
+                    active_next[j + 1] |= advance;
                     // If the next state is a wildcard it can be automatically skipped.
-                    if j+1 < state_nr && self.states[j+1] == State::Wildcard {
-                        active_next[j+2] |= advance;
+                    if j + 1 < state_nr && self.states[j + 1] == State::Wildcard {
+                        active_next[j + 2] |= advance;
                     }
                 }
             }
@@ -109,13 +109,8 @@ impl CompiledPat for General {
                 active_next[j] = false;
             }
         }
-        if active[state_nr] {
-            // We are expecting EOF to end the pattern, and the current string character is an EOF.
-            // In other words, the pattern has been matched.
-            true
-        } else {
-            false
-        }
+        // The pattern can only be matched if we are expecting an EOF to end the pattern, and the current string character is an EOF.
+        active[state_nr]
     }
 }
 

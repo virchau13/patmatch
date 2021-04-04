@@ -213,7 +213,7 @@ mod tests {
                 assert_eq!(
                     pat.matches(string),
                     expected,
-                    "Pattern {} failed to match against {}",
+                    "Pattern {:?} failed to match against {}",
                     pat,
                     string
                 );
@@ -243,18 +243,11 @@ mod tests {
     }
 
     fn matches_s(patterns: Vec<&str>, strings: Vec<&str>) {
-        matches(
-            strings_to_pats(patterns),
-            strings,
-        )
+        matches(strings_to_pats(patterns), strings)
     }
 
     fn no_match_s(patterns: Vec<&str>, strings: Vec<&str>) {
-        check_match(
-            strings_to_pats(patterns),
-            strings,
-            false
-        )
+        check_match(strings_to_pats(patterns), strings, false)
     }
 
     macro_rules! chunk {
@@ -277,27 +270,19 @@ mod tests {
         matches_s(
             vec![
                 "*", "c*", "*t", "*a*", "c*t", "ca*", "*at", "???", "?a?", "c??", "??t", "ca?",
-                "?at", "c?t", "cat", "ca*t", "c*at", "*cat", "cat*", "ca****t"
+                "?at", "c?t", "cat", "ca*t", "c*at", "*cat", "cat*", "ca****t",
             ],
-            vec!["cat"]
+            vec!["cat"],
         );
         no_match_s(
-            vec![
-                "cat?", "?cat", "c?at", "ca?t", "?", "??", "????", "", " *"
-            ],
-            vec!["cat"]
+            vec!["cat?", "?cat", "c?at", "ca?t", "?", "??", "????", "", " *"],
+            vec!["cat"],
         );
     }
 
     #[test]
     fn empty() {
-        matches_s(
-            vec![""],
-            vec![""]
-        );
-        no_match_s(
-            vec![""],
-            vec!["a", "b", "c", " ", "\t", "\n"]
-        );
+        matches_s(vec![""], vec![""]);
+        no_match_s(vec![""], vec!["a", "b", "c", " ", "\t", "\n"]);
     }
 }

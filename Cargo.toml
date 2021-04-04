@@ -12,7 +12,6 @@ A configurable pattern matching / wildcard matching library.
 readme = "README.md"
 keywords = ["pattern", "matching", "wildcard", "match"]
 license = "MIT"
-license-file = "LICENSE"
 categories = ["algorithms"]
 
 [dependencies]
