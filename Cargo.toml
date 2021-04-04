@@ -1,0 +1,9 @@
+[package]
+name = "patmatch"
+version = "0.1.0"
+authors = ["virchau13 <virchau13@mail.hexular.net>"]
+edition = "2018"
+
+[dependencies]
+bitflags = "1.0"
+dyn-clone = "1.0.4"
