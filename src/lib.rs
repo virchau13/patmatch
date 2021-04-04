@@ -26,12 +26,6 @@ pub struct Pattern {
     pat: Box<dyn CompiledPat>,
 }
 
-impl fmt::Display for Pattern {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.pat.fmt(f)
-    }
-}
-
 /// A trait for compiled patterns.
 trait CompiledPat: fmt::Debug + DynClone {
     /// See [`Pattern::matches`], which calls this.
