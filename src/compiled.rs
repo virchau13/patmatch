@@ -102,8 +102,6 @@ impl CompiledPat for General {
                     }
                 }
             }
-            dbg!(&active);
-            dbg!(&active_next);
             active.swap_with_slice(&mut active_next);
             for j in 0..state_nr + 1 {
                 active_next[j] = false;

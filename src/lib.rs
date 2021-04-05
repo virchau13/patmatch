@@ -89,7 +89,6 @@ impl FromIterator<Chunk> for Pattern {
     /// ```
     fn from_iter<T: IntoIterator<Item = Chunk>>(iter: T) -> Self {
         use compiled::*;
-        dbg!("HI!");
         let mut chunks = Vec::new();
         for chunk in iter {
             if !(chunk == Chunk::Wildcard && chunks.ends_with(&[Chunk::Wildcard])) {
@@ -97,7 +96,6 @@ impl FromIterator<Chunk> for Pattern {
             }
         }
         let chunks = chunks;
-        dbg!(&chunks);
         if chunks.iter().all(|chunk| chunk == &Chunk::UnknownChar) {
             // (Also handles the empty string.)
             Pattern::from_compiled(OptionalCharLen { len: chunks.len() })
@@ -142,7 +140,6 @@ impl<T: Iterator<Item = char>> Iterator for CompileIter<T> {
                     let mut string = String::new();
                     string.push(chr);
                     loop {
-                        dbg!("ok");
                         match self.iter.peek() {
                             Some(peeked) if !self.opts.contains(MatchOptions::from(*peeked)) => {
                                 string.push(*peeked);
