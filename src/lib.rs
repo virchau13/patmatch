@@ -50,7 +50,7 @@ pub enum Chunk {
 impl Chunk {
     /// Turns `chr` into any of the non-[`Chunk::Str`] variants (e.g. [`Chunk::Wildcard`], etc.)
     /// Only really used for ease of implementation of [`Pattern::compile`].
-    fn from_char(chr: char) -> Option<Chunk> {
+    fn from_special_char(chr: char) -> Option<Chunk> {
         use Chunk::*;
         match chr {
             '*' => Some(Wildcard),
@@ -134,13 +134,20 @@ impl<T: Iterator<Item = char>> Iterator for CompileIter<T> {
         use Chunk::*;
         match self.iter.next() {
             None => None,
-            Some(chr) => Some(match chr {
-                c if self.opts.contains(c.into()) => Chunk::from_char(c).unwrap(),
+            Some(mut chr) => Some(match chr {
+                c if self.opts.contains(c.into()) => Chunk::from_special_char(c).unwrap(),
                 _ => {
                     let mut string = String::new();
+                    if chr == '\\' {
+                        chr = self.iter.next().unwrap_or('\\');
+                    }
                     string.push(chr);
                     loop {
                         match self.iter.peek() {
+                            Some('\\') => {
+                                self.iter.next();
+                                string.push(self.iter.next().unwrap_or('\\'));
+                            }
                             Some(peeked) if !self.opts.contains(MatchOptions::from(*peeked)) => {
                                 string.push(*peeked);
                                 self.iter.next();
@@ -281,5 +288,65 @@ mod tests {
     fn empty() {
         matches_s(vec![""], vec![""]);
         no_match_s(vec![""], vec!["a", "b", "c", " ", "\t", "\n"]);
+    }
+
+    #[test]
+    fn patmatch() {
+        matches_s(
+            vec![
+                "pat?atch",
+                "patm?tch",
+                "p??????h",
+                "p???a??h",
+                "p???*??h",
+                "p???*???h",
+                "p*******************************************atmatch",
+                "\\p\\a\\t\\m\\a\\t\\c\\h",
+                "\\pat\\match",
+                "*",
+                "**",
+                "***",
+                "****",
+                "*?*?*?*?*?*",
+                "???**?*?*??",
+                "???**a*??*?",
+                "*p*",
+                "*pa*",
+                "*ma*",
+                "*tm*",
+                "**tm**",
+                "*tch*",
+                "*t*a*",
+                "*m*t*",
+                "*m*c*",
+                "p\\at*",
+                "*atmatc*",
+            ],
+            vec!["patmatch"],
+        );
+        no_match_s(
+            vec![
+                "pat\\*match",
+                "patmatch?",
+                "p\\?tmatch",
+                "pat\\\\match",
+                "p\\y",
+                "y",
+                "xsdaf",
+                "*x",
+                "*x*",
+                "*p*k",
+                "*c*m*",
+                "*c*m*a*",
+                "*c*a*m*",
+                "p\\a*\\*t",
+                "p??t",
+                "patmat",
+                "patmatc",
+                "?atmatc",
+                "*atmat",
+            ],
+            vec!["patmatch"],
+        );
     }
 }
